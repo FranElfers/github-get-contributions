@@ -1,4 +1,6 @@
 const https = require('https')
+const express = require('express')
+const app = express()
 
 const getData = (user, year) => {
 	let data = undefined
@@ -29,14 +31,55 @@ const getData = (user, year) => {
 }
 
 const asyncCall = async function(user, from, to) {
-	let total = 0
+	let totalContributions = 0
+	let years = {}
 	
 	for (let i = from; i <= to; i++) {
 		let data = await getData(user, i)
-		console.log(i, data || 0)
-		total += data
+		years[i] = data || 0
+		totalContributions += data
 	}
-	return total
+	return {
+		totalContributions,
+		...years
+	}
 }
 
-asyncCall('FranElfers', 2021, 2022).then(res => console.log('total',res))
+app.get('/', (req,res) => {
+	let error = '', message = 'no errors'
+	const currentYear = (new Date()).getFullYear()
+	let from = parseInt(req.query.from)
+	let to = parseInt(req.query.to)
+	const user = req.query.user
+	
+	if (!from || !to || !user) {
+		error = 'Queries missing, format: ?user=<user>&from=<startingYear>&to=<endingYear>'
+	}
+	
+	if (from > to) {
+		messaje = `${from} is not bigger than ${to}, doing instead ${to} to ${from}`
+	}
+
+	if (from < 2010) {
+		from = 2010
+		message = `"from" must be > 2010, doing instead ${currentYear}`
+	}
+
+	if (to > currentYear) {
+		to = currentYear
+		message = `"to" must be < ${currentYear}, doing instead ${currentYear}`
+	}
+
+	if (error) return res.send({error})
+
+	asyncCall(user, Math.min(from,to), Math.max(from,to)).then(data => {
+		console.log('total', data.totalContributions)
+		res.send({ message, ...data })
+	})
+
+})
+
+
+app.listen(3000, () => {
+	console.log('Running on 3000')
+})
