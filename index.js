@@ -1,6 +1,8 @@
 const https = require('https')
 const express = require('express')
 const app = express()
+const PORT = process.env.PORT || 3000
+const serverLog = t => console.log("[server]: " + t)
 
 const getData = (user, year) => {
 	let data = undefined
@@ -73,13 +75,13 @@ app.get('/', (req,res) => {
 	if (error) return res.send({error})
 
 	asyncCall(user, Math.min(from,to), Math.max(from,to)).then(data => {
-		console.log('total', data.totalContributions)
+		serverLog('total', data.totalContributions)
 		res.send({ message, ...data })
 	})
 
 })
 
 
-app.listen(3000, () => {
-	console.log('Running on 3000')
+app.listen(PORT, () => {
+	serverLog('Running on ' + PORT)
 })
