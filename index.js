@@ -51,10 +51,10 @@ app.get('/', (req,res) => {
 	let error = '', message = 'no errors'
 	const currentYear = (new Date()).getFullYear()
 	let from = parseInt(req.query.from)
-	let to = parseInt(req.query.to)
+	let to = parseInt(req.query.to) || currentYear
 	const user = req.query.user
 	
-	if (!from || !to || !user) {
+	if (!from || !user) {
 		error = 'Queries missing, format: ?user=<user>&from=<startingYear>&to=<endingYear>'
 	}
 	
@@ -64,23 +64,21 @@ app.get('/', (req,res) => {
 
 	if (from < 2010) {
 		from = 2010
-		message = `"from" must be > 2010, doing instead ${currentYear}`
+		message = `"from" must be > 2010, doing 2010 instead`
 	}
 
 	if (to > currentYear) {
 		to = currentYear
-		message = `"to" must be < ${currentYear}, doing instead ${currentYear}`
+		message = `"to" must be < ${currentYear}, doing ${currentYear} instead`
 	}
 
-	if (error) return res.send({error})
+	if (error) return res.json({error})
 
 	asyncCall(user, Math.min(from,to), Math.max(from,to)).then(data => {
 		serverLog('total', data.totalContributions)
-		res.send({ message, ...data })
+		res.json({ message, ...data })
 	})
-
 })
-
 
 app.listen(PORT, () => {
 	serverLog('Running on ' + PORT)
