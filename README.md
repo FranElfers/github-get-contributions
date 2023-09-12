@@ -1,19 +1,27 @@
 # Github-get-contributions API
 
-API that facilitates the total contributions count of any github user
+API that facilitates the total contributions count of any github user.
 
-## Heroku hosting
+## Installation and setup
 
-https://github-get-contributions.herokuapp.com/
+Run **npm install** and **npm start**.
 
-## URL queries
+(**Optional step**) The port can be defined in the .env file:
 
-?user=&lt;user&gt;&from=&lt;from&gt;
+```toml
+PORT=3000
+```
 
-?user=&lt;user&gt;&from=&lt;from&gt;&to=&lt;to&gt;
+## Endpoint queries
 
-### Example
+**Get total contributions from a certain date**
 
-"FranElfers" from 2018 to 2022
+`http://localhost:3000/?user=<user>&from=<from>`
 
-https://github-get-contributions.herokuapp.com/?user=franelfers&from=2018&to=2022
+**Get contributions in a date range**
+
+`http://localhost:3000/?user=<user>&from=<from>&to=<to>`
+
+**Example**
+
+`http://localhost:3000/?user=franelfers&from=2018&to=2023`
